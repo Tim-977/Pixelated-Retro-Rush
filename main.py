@@ -30,7 +30,7 @@ def main():
     all_sprites = pygame.sprite.Group()
 
     # изображение должно лежать в папке data
-    bowl_image = pygame.transform.scale(load_image("bowl.png", -1), (200, 100))
+    bowl_image = pygame.transform.scale(load_image("bowl.png"), (200, 100))
     bowl = pygame.sprite.Sprite(all_sprites)
     bowl.image = bowl_image
     bowl.rect = bowl.image.get_rect()
@@ -47,18 +47,19 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE :
+                    move *= -1
+                    print('MOVE CHANGED')
         key = pygame.key.get_pressed()
-        if key[pygame.K_SPACE]:
-                move *= -1
-                print('MOVE CHANGED')
         if move == 1:
             bowl.rect.left += 1
-            if bowl.rect.left >= 999:
+            if bowl.rect.left >= 1000:
                 bowl.rect.left = -200
         if move == -1:
             bowl.rect.left -= 1
             if bowl.rect.left <= -200:
-                move = 1
+                bowl.rect.left = 1000
         print(bowl.rect.left)
             #key = pygame.key.get_pressed()
             #if key[pygame.K_RIGHT]:
