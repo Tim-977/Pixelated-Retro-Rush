@@ -24,6 +24,8 @@ def load_image(name, color_key=None):
 
 def main():
     size = 1000, 700
+    global score
+    score = 0
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption('Бабиджонка!')
 
@@ -39,35 +41,66 @@ def main():
     bowl.rect = bowl.image.get_rect()
     bowl.rect.top = 600
     bowl.rect.left = 400
-    points = 0
 
-    class Apple(pygame.sprite.Sprite):
-        image = pygame.transform.scale(load_image("simpleDrop.png", -1), (75, 75))
+    class onePointDrop(pygame.sprite.Sprite):
+        image = pygame.transform.scale(load_image("onePointDrop.png", -1),
+                                       (75, 75))
 
         def __init__(self, *group):
             # НЕОБХОДИМО вызвать конструктор родительского класса Sprite.
             # Это очень важно!!!
             super().__init__(*group)
-            self.image = Apple.image
+            self.image = onePointDrop.image
             self.rect = self.image.get_rect()
             self.rect.top = 50
             self.rect.left = random.randint(50, 900)
- 
+
         def update(self):
+            global score
             self.rect = self.rect.move(random.randrange(3) - 1, 3)
             if pygame.sprite.spritecollideany(self, all_sprites):
                 placeSP_group.add([self])
                 placeSP_group.sprites()[0].kill()
-                #print('REMOVED')
+                score += 1
+                print(score)
+                print('REMOVED: onePointDrop')
+
+    class twoPointDrop(pygame.sprite.Sprite):
+        image = pygame.transform.scale(load_image("twoPointDrop.png", -1),
+                                       (75, 75))
+
+        def __init__(self, *group):
+            # НЕОБХОДИМО вызвать конструктор родительского класса Sprite.
+            # Это очень важно!!!
+            super().__init__(*group)
+            self.image = twoPointDrop.image
+            self.rect = self.image.get_rect()
+            self.rect.top = 50
+            self.rect.left = random.randint(50, 900)
+
+        def update(self):
+            global score
+            self.rect = self.rect.move(random.randrange(3) - 1, 3)
+            if pygame.sprite.spritecollideany(self, all_sprites):
+                placeSP_group.add([self])
+                placeSP_group.sprites()[0].kill()
+                score += 2
+                print(score)
+                print('REMOVED: twoPointDrop')
 
     # шаг перемещения
     dist = 10
- 
+
     running = True
     move = 1
     while running:
-        if not random.randint(0, 125):
-            Apple(drops)
+        nrand = random.randint(0, 500)
+        if nrand < 5:
+            onePointDrop(drops)
+            print('SPAWNED: onePointDrop')
+        elif nrand == 5:
+            twoPointDrop(drops)
+            print('SPAWNED: twoPointDrop')
         drops.update()
         #simpleDrop
         pygame.time.delay(10)
