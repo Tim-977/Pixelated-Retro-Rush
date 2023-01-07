@@ -4,6 +4,8 @@ import random
 
 import pygame
 
+pygame.init()
+
 
 def load_image(name, color_key=None):
     fullname = os.path.join('data', name)
@@ -23,6 +25,12 @@ def load_image(name, color_key=None):
 
 
 def main():
+
+    def texts(score):
+        font = pygame.font.Font(None, 30)
+        scoretext = font.render(f"Score: {str(score)}", 1, (250, 0, 0))
+        screen.blit(scoretext, (100, 100))
+
     size = 1000, 700
     global score
     score = 0
@@ -41,29 +49,6 @@ def main():
     bowl.rect = bowl.image.get_rect()
     bowl.rect.top = 600
     bowl.rect.left = 400
-
-    class onePointDrop(pygame.sprite.Sprite):
-        image = pygame.transform.scale(load_image("onePointDrop.png", -1),
-                                       (75, 75))
-
-        def __init__(self, *group):
-            # НЕОБХОДИМО вызвать конструктор родительского класса Sprite.
-            # Это очень важно!!!
-            super().__init__(*group)
-            self.image = onePointDrop.image
-            self.rect = self.image.get_rect()
-            self.rect.top = 50
-            self.rect.left = random.randint(50, 900)
-
-        def update(self):
-            global score
-            self.rect = self.rect.move(random.randrange(3) - 1, 3)
-            if pygame.sprite.spritecollideany(self, all_sprites):
-                placeSP_group.add([self])
-                placeSP_group.sprites()[0].kill()
-                score += 1
-                print(score)
-                print('REMOVED: onePointDrop')
 
     class twoPointDrop(pygame.sprite.Sprite):
         image = pygame.transform.scale(load_image("twoPointDrop.png", -1),
@@ -85,8 +70,83 @@ def main():
                 placeSP_group.add([self])
                 placeSP_group.sprites()[0].kill()
                 score += 2
+                texts(score)
                 print(score)
                 print('REMOVED: twoPointDrop')
+
+    class fourPointDrop(pygame.sprite.Sprite):
+        image = pygame.transform.scale(load_image("fourPointDrop.png", -1),
+                                       (75, 75))
+
+        def __init__(self, *group):
+            # НЕОБХОДИМО вызвать конструктор родительского класса Sprite.
+            # Это очень важно!!!
+            super().__init__(*group)
+            self.image = fourPointDrop.image
+            self.rect = self.image.get_rect()
+            self.rect.top = 50
+            self.rect.left = random.randint(50, 900)
+
+        def update(self):
+            global score
+            self.rect = self.rect.move(random.randrange(3) - 1, 3)
+            if pygame.sprite.spritecollideany(self, all_sprites):
+                placeSP_group.add([self])
+                placeSP_group.sprites()[0].kill()
+                score += 4
+                texts(score)
+                print(score)
+                print('REMOVED: fourPointDrop')
+
+    class minusDrop(pygame.sprite.Sprite):
+        image = pygame.transform.scale(load_image("minusDrop.png", -1),
+                                       (75, 75))
+
+        def __init__(self, *group):
+            # НЕОБХОДИМО вызвать конструктор родительского класса Sprite.
+            # Это очень важно!!!
+            super().__init__(*group)
+            self.image = minusDrop.image
+            self.rect = self.image.get_rect()
+            self.rect.top = 50
+            self.rect.left = random.randint(50, 900)
+
+        def update(self):
+            global score
+            self.rect = self.rect.move(random.randrange(3) - 1, 3)
+            if pygame.sprite.spritecollideany(self, all_sprites):
+                placeSP_group.add([self])
+                placeSP_group.sprites()[0].kill()
+                score -= 20
+                texts(score)
+                print(score)
+                print('REMOVED: minusDrop')
+
+    class slice(pygame.sprite.Sprite):
+        image = pygame.transform.scale(load_image("slice.png", -1), (75, 75))
+
+        def __init__(self, *group):
+            # НЕОБХОДИМО вызвать конструктор родительского класса Sprite.
+            # Это очень важно!!!
+            super().__init__(*group)
+            self.image = slice.image
+            self.rect = self.image.get_rect()
+            self.rect.top = 50
+            self.rect.left = random.randint(50, 900)
+
+        def update(self):
+            global score
+            self.rect = self.rect.move(random.randrange(3) - 1, 3)
+            if pygame.sprite.spritecollideany(self, all_sprites):
+                placeSP_group.add([self])
+                placeSP_group.sprites()[0].kill()
+                if score >= 0:
+                    score //= 2
+                else:
+                    score *= 2
+                texts(score)
+                print(score)
+                print('REMOVED: slice')
 
     # шаг перемещения
     dist = 10
@@ -94,13 +154,19 @@ def main():
     running = True
     move = 1
     while running:
-        nrand = random.randint(0, 500)
-        if nrand < 5:
-            onePointDrop(drops)
-            print('SPAWNED: onePointDrop')
-        elif nrand == 5:
+        nrand = random.randint(0, 10250)
+        if nrand < 100:
             twoPointDrop(drops)
             print('SPAWNED: twoPointDrop')
+        elif 100 <= nrand < 150:
+            fourPointDrop(drops)
+            print('SPAWNED: fourPointDrop')
+        elif 150 <= nrand < 200:
+            minusDrop(drops)
+            print('SPAWNED: minusDrop')
+        elif 200 <= nrand < 300:
+            slice(drops)
+            print('SPAWNED: minusDrop')
         drops.update()
         #simpleDrop
         pygame.time.delay(10)
