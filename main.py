@@ -28,7 +28,7 @@ def main():
         pygame.font.init()
         font = pygame.font.Font("Arial.ttf", 30)
         scoretext = font.render(f"Score: {str(score)}", 1, (200, 0, 0))
-        screen.blit(scoretext, (100, 100))
+        screen.blit(scoretext, (10, 10))
 
     size = 1000, 700
     global score
@@ -143,17 +143,17 @@ def main():
     running = True
     move = 1
     while running:
-        nrand = random.randint(0, 10250)
-        if nrand < 100:
+        nrand = random.randint(0, 1025000)
+        if nrand < 10000:
             twoPointDrop(drops)
             print('SPAWNED: twoPointDrop')
-        elif 100 <= nrand < 150:
+        elif 10000 <= nrand < 15000:
             fourPointDrop(drops)
             print('SPAWNED: fourPointDrop')
-        elif 150 <= nrand < 200:
+        elif 15000 <= nrand < 20000:
             minusDrop(drops)
             print('SPAWNED: minusDrop')
-        elif 200 <= nrand < 300:
+        elif 20000 <= nrand < 30000:
             slice(drops)
             print('SPAWNED: minusDrop')
         drops.update()
