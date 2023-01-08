@@ -4,8 +4,6 @@ import random
 
 import pygame
 
-pygame.init()
-
 
 def load_image(name, color_key=None):
     fullname = os.path.join('data', name)
@@ -27,8 +25,9 @@ def load_image(name, color_key=None):
 def main():
 
     def texts(score):
-        font = pygame.font.Font(None, 30)
-        scoretext = font.render(f"Score: {str(score)}", 1, (250, 0, 0))
+        pygame.font.init()
+        font = pygame.font.Font("Arial.ttf", 30)
+        scoretext = font.render(f"Score: {str(score)}", 1, (200, 0, 0))
         screen.blit(scoretext, (100, 100))
 
     size = 1000, 700
@@ -70,7 +69,6 @@ def main():
                 placeSP_group.add([self])
                 placeSP_group.sprites()[0].kill()
                 score += 2
-                texts(score)
                 print(score)
                 print('REMOVED: twoPointDrop')
 
@@ -94,7 +92,6 @@ def main():
                 placeSP_group.add([self])
                 placeSP_group.sprites()[0].kill()
                 score += 4
-                texts(score)
                 print(score)
                 print('REMOVED: fourPointDrop')
 
@@ -118,7 +115,6 @@ def main():
                 placeSP_group.add([self])
                 placeSP_group.sprites()[0].kill()
                 score -= 20
-                texts(score)
                 print(score)
                 print('REMOVED: minusDrop')
 
@@ -140,16 +136,9 @@ def main():
             if pygame.sprite.spritecollideany(self, all_sprites):
                 placeSP_group.add([self])
                 placeSP_group.sprites()[0].kill()
-                if score >= 0:
-                    score //= 2
-                else:
-                    score *= 2
-                texts(score)
+                score //= 2
                 print(score)
                 print('REMOVED: slice')
-
-    # шаг перемещения
-    dist = 10
 
     running = True
     move = 1
@@ -177,7 +166,6 @@ def main():
                 if event.key == pygame.K_SPACE:
                     move *= -1
                     #print('MOVE CHANGED')
-        key = pygame.key.get_pressed()
         if move == 1:
             bowl.rect.left += 5
             if bowl.rect.left >= 1000:
@@ -190,6 +178,7 @@ def main():
         screen.fill(pygame.Color("royalblue"))
         all_sprites.draw(screen)
         drops.draw(screen)
+        texts(score)
         pygame.display.flip()
 
     pygame.quit()
