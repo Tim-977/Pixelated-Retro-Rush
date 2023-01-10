@@ -1,8 +1,11 @@
 import os
 import random
-#from time import sleep
+import sys
 
 import pygame
+from pygame import mixer
+
+#from time import sleep
 
 
 def load_image(name, color_key=None):
@@ -24,23 +27,65 @@ def load_image(name, color_key=None):
 
 def main():
 
-    def texts(score):
+    def start_screen():
+        intro_text = [
+            "ЗАСТАВКА", "", "Правила игры", "Если в правилах несколько строк,",
+            "приходится выводить их построчно"
+        ]
+        mixer.init()
+        mixer.music.load('data\\start.mp3')
+        mixer.music.play()
         pygame.font.init()
-        font = pygame.font.Font("Arial.ttf", 30)
-        scoretext = font.render(f"Score: {str(score)}", 1, (200, 0, 0))
+        fon = pygame.transform.scale(load_image('fon.jpg'), (WIDTH, HEIGHT))
+        screen.blit(fon, (0, 0))
+        font = pygame.font.Font('Arial.ttf', 30)
+        text_coord = 50
+        for line in intro_text:
+            string_rendered = font.render(line, 1, pygame.Color('white'))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 10
+            text_coord += intro_rect.height
+            screen.blit(string_rendered, intro_rect)
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    mixer.music.stop()
+                    terminate()
+                elif event.type == pygame.KEYDOWN or \
+                        event.type == pygame.MOUSEBUTTONDOWN:
+                    return  # начинаем игру
+            pygame.display.flip()
+
+    def terminate():
+        pygame.quit()
+        sys.exit()
+
+    def texts(score, drops_collected):
+        pygame.font.init()
+        font = pygame.font.Font("BoldPixelSans.ttf", 30)
+        scoretext = font.render(
+            f"Score: {str(score)} | All: {str(drops_collected)}", 1,
+            (200, 0, 0))
         screen.blit(scoretext, (10, 10))
 
-    size = 1000, 700
+    size = (WIDTH, HEIGHT) = 1000, 700
     global score
+    global drops_collected
     score = 0
+    drops_collected = 0
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption('Бабиджонка!')
-
+    start_screen()
     # группа, содержащая все спрайты
     placeSP_group = pygame.sprite.OrderedUpdates()
     all_sprites = pygame.sprite.Group()
     drops = pygame.sprite.Group()
-
+    mixer.init()
+    pygame.mixer.music.load('data\\fight.mp3')
+    pygame.mixer.music.play(-1)
     # изображение должно лежать в папке data
     bowl_image = pygame.transform.scale(load_image("bowl.png", -1), (200, 100))
     bowl = pygame.sprite.Sprite(all_sprites)
@@ -64,11 +109,14 @@ def main():
 
         def update(self):
             global score
+            global drops_collected
             self.rect = self.rect.move(random.randrange(3) - 1, 3)
             if pygame.sprite.spritecollideany(self, all_sprites):
                 placeSP_group.add([self])
                 placeSP_group.sprites()[0].kill()
                 score += 2
+                drops_collected += 1
+                mixer.Channel(1).play(mixer.Sound('data\\coin.mp3'))
                 print(score)
                 print('REMOVED: twoPointDrop')
 
@@ -87,11 +135,14 @@ def main():
 
         def update(self):
             global score
+            global drops_collected
             self.rect = self.rect.move(random.randrange(3) - 1, 3)
             if pygame.sprite.spritecollideany(self, all_sprites):
                 placeSP_group.add([self])
                 placeSP_group.sprites()[0].kill()
                 score += 4
+                drops_collected += 1
+                mixer.Channel(1).play(mixer.Sound('data\\coin.mp3'))
                 print(score)
                 print('REMOVED: fourPointDrop')
 
@@ -110,11 +161,14 @@ def main():
 
         def update(self):
             global score
+            global drops_collected
             self.rect = self.rect.move(random.randrange(3) - 1, 3)
             if pygame.sprite.spritecollideany(self, all_sprites):
                 placeSP_group.add([self])
                 placeSP_group.sprites()[0].kill()
                 score -= 20
+                drops_collected += 1
+                mixer.Channel(1).play(mixer.Sound('data\\expl2.mp3'))
                 print(score)
                 print('REMOVED: minusDrop')
 
@@ -132,11 +186,14 @@ def main():
 
         def update(self):
             global score
+            global drops_collected
             self.rect = self.rect.move(random.randrange(3) - 1, 3)
             if pygame.sprite.spritecollideany(self, all_sprites):
                 placeSP_group.add([self])
                 placeSP_group.sprites()[0].kill()
                 score //= 2
+                drops_collected += 1
+                mixer.Channel(1).play(mixer.Sound('data\\expl1.mp3'))
                 print(score)
                 print('REMOVED: slice')
 
@@ -155,7 +212,7 @@ def main():
             print('SPAWNED: minusDrop')
         elif 20000 <= nrand < 30000:
             slice(drops)
-            print('SPAWNED: minusDrop')
+            print('SPAWNED: slice')
         drops.update()
         #simpleDrop
         pygame.time.delay(10)
@@ -165,6 +222,7 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     move *= -1
+                    mixer.Channel(0).play(mixer.Sound('data\\rotate.mp3'))
                     #print('MOVE CHANGED')
         if move == 1:
             bowl.rect.left += 5
@@ -178,7 +236,7 @@ def main():
         screen.fill(pygame.Color("royalblue"))
         all_sprites.draw(screen)
         drops.draw(screen)
-        texts(score)
+        texts(score, drops_collected)
         pygame.display.flip()
 
     pygame.quit()
