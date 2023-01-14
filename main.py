@@ -5,8 +5,6 @@ import sys
 import pygame
 from pygame import mixer
 
-#from time import sleep
-
 
 def load_image(name, color_key=None):
     fullname = os.path.join('data', name)
@@ -280,13 +278,17 @@ while running:
     pygame.time.delay(10)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
+            terminate()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 bullet(protection)
                 mixer.Channel(0).play(mixer.Sound('data\\rotate.mp3'))
                 move *= -1
                 #print('MOVE CHANGED')
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_DOWN:
+                mixer.music.stop()
+                running = False
     if move == 1:
         bowl.rect.left += 5
         if bowl.rect.left >= 1000:
@@ -302,6 +304,18 @@ while running:
     protection.draw(screen)
     drops.draw(screen)
     texts(score, drops_collected, posScore)
+    pygame.display.flip()
+
+size = (WIDTH, HEIGHT) = 600, 700
+
+screen = pygame.display.set_mode(size)
+pygame.display.set_caption('Финал!')
+running = True
+while running:
+    screen.fill(pygame.Color("green"))
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
     pygame.display.flip()
 
 pygame.quit()
