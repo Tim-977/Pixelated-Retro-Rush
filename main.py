@@ -5,6 +5,7 @@ import sys
 import pygame
 from pygame import mixer
 
+name = 'User'
 
 def load_image(name, color_key=None):
     fullname = os.path.join('data', name)
@@ -25,8 +26,8 @@ def load_image(name, color_key=None):
 
 def start_screen():
     intro_text = [
-        "ЗАСТАВКА", "", "Правила игры", "Если в правилах несколько строк,",
-        "приходится выводить их построчно"
+        "ЗАСТАВКА", "", "Правила игры", "Правило №1",
+        "Правило №2"
     ]
     mixer.init()
     mixer.music.load('data\\start.mp3')
@@ -69,7 +70,7 @@ def texts(score, drops_collected, ps, phase):
             scoretext = font.render(
                 f"Score: {str(score)} | Accuracy: {str(round(ps / (drops_collected) * 100))}%",
                 1, (200, 0, 0))
-            screen.blit(scoretext, (10, 10))
+            screen.blit(scoretext, (10, 10))    
         else:
             scoretext = font.render(
                 f"Score: {str(score)} | Accuracy: {str(drops_collected)}%", 1,
@@ -81,14 +82,14 @@ def texts(score, drops_collected, ps, phase):
             scoretext = font.render(
                 f"Score: {str(score)} | Accuracy: {str(round(ps / (drops_collected) * 100))}%",
                 1, (200, 0, 0))
-            screen.blit(scoretext, (90, 50))
+            screen.blit(scoretext, (80, 50))
             screen.blit(gameOverText, (200, 10))
         else:
             gameOverText = font.render(f"GAME OVER",1, (200, 0, 0))
             scoretext = font.render(
                 f"Score: {str(score)} | Accuracy: {str(drops_collected)}%", 1,
                 (200, 0, 0))
-            screen.blit(scoretext, (90, 50))
+            screen.blit(scoretext, (80, 50))
             screen.blit(gameOverText, (200, 10))
 
 
@@ -371,3 +372,7 @@ while running:
     pygame.display.flip()
 
 pygame.quit()
+
+import dbparser as dbp
+
+dbp.insert_result('records.db', name, score, round(posScore / (drops_collected) * 100))
