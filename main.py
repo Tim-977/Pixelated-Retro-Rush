@@ -61,30 +61,43 @@ def terminate():
     sys.exit()
 
 
-def texts(score, drops_collected, ps):
+def texts(score, drops_collected, ps, phase):
     pygame.font.init()
     font = pygame.font.Font("BoldPixelSans.ttf", 30)
-    if drops_collected:
-        scoretext = font.render(
-            f"Score: {str(score)} | Accuracy: {str(round(ps / (drops_collected) * 100))}%",
-            1, (200, 0, 0))
-        screen.blit(scoretext, (10, 10))
-    else:
-        scoretext = font.render(
-            f"Score: {str(score)} | Accuracy: {str(drops_collected)}%", 1,
-            (200, 0, 0))
-        screen.blit(scoretext, (10, 10))
+    if phase == 'middleGame':
+        if drops_collected:
+            scoretext = font.render(
+                f"Score: {str(score)} | Accuracy: {str(round(ps / (drops_collected) * 100))}%",
+                1, (200, 0, 0))
+            screen.blit(scoretext, (10, 10))
+        else:
+            scoretext = font.render(
+                f"Score: {str(score)} | Accuracy: {str(drops_collected)}%", 1,
+                (200, 0, 0))
+            screen.blit(scoretext, (10, 10))
+    elif phase == 'gameOver':
+        if drops_collected:
+            gameOverText = font.render(f"GAME OVER",1, (200, 0, 0))
+            scoretext = font.render(
+                f"Score: {str(score)} | Accuracy: {str(round(ps / (drops_collected) * 100))}%",
+                1, (200, 0, 0))
+            screen.blit(scoretext, (90, 50))
+            screen.blit(gameOverText, (200, 10))
+        else:
+            gameOverText = font.render(f"GAME OVER",1, (200, 0, 0))
+            scoretext = font.render(
+                f"Score: {str(score)} | Accuracy: {str(drops_collected)}%", 1,
+                (200, 0, 0))
+            screen.blit(scoretext, (90, 50))
+            screen.blit(gameOverText, (200, 10))
 
 
 size = (WIDTH, HEIGHT) = 1000, 700
 
-global score
-global posScore
-global drops_collected
-
 score = 0
 posScore = 0
 drops_collected = 0
+healthPoints = 3
 
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption('Бабиджонка!')
@@ -107,6 +120,19 @@ bowl.rect = bowl.image.get_rect()
 bowl.rect.top = 600
 bowl.rect.left = 400
 
+health_image_1 = pygame.transform.scale(load_image("heart_label.png", -1),
+                                        (100, 100))
+health_image_2 = pygame.transform.scale(load_image("heart_label.png", -1),
+                                        (100, 100))
+health_image_3 = pygame.transform.scale(load_image("heart_label.png", -1),
+                                        (100, 100))
+screen.blit(health_image_1, (900, 100))
+screen.blit(health_image_2, (900, 100))
+screen.blit(health_image_3, (900, 100))
+pygame.display.flip()
+running = True
+direction = 1
+
 
 class bullet(pygame.sprite.Sprite):
     image = pygame.transform.scale(load_image("bullet.png", -1), (30, 95))
@@ -123,15 +149,35 @@ class bullet(pygame.sprite.Sprite):
         global posScore
         global drops_collected
         self.rect = self.rect.move(0, -12)
-        #if pygame.sprite.spritecollideany(self, bowlGR):
-        #    placeSP_group.add([self])
-        #    placeSP_group.sprites()[0].kill()
-        #    score += 2
-        #    posScore += 1
-        #    drops_collected += 1
-        #    mixer.Channel(1).play(mixer.Sound('data\\coin.mp3'))
-        #    print(score)
-        #    print('REMOVED: bullet')
+
+
+class heartDrop(pygame.sprite.Sprite):
+    image = pygame.transform.scale(load_image("heart.png", -1), (75, 75))
+
+    def __init__(self, *group):
+        super().__init__(*group)
+        self.image = heartDrop.image
+        self.rect = self.image.get_rect()
+        self.rect.top = 50
+        self.rect.left = random.randint(50, 900)
+
+    def update(self):
+        global score
+        global posScore
+        global drops_collected
+        global healthPoints
+        self.rect = self.rect.move(random.randrange(3) - 1, 3)
+        if pygame.sprite.spritecollideany(self, bowlGR):
+            placeSP_group.add([self])
+            placeSP_group.sprites()[0].kill()
+            if healthPoints < 3:
+                healthPoints += 1
+            mixer.Channel(1).play(mixer.Sound('data\\health.mp3'))
+
+        if pygame.sprite.spritecollideany(self, protection):
+            placeSP_group.add([self])
+            placeSP_group.sprites()[0].kill()
+            mixer.Channel(1).play(mixer.Sound('data\\kill.mp3'))
 
 
 class twoPointDrop(pygame.sprite.Sprite):
@@ -211,15 +257,18 @@ class minusDrop(pygame.sprite.Sprite):
     def update(self):
         global score
         global drops_collected
+        global running
+        global healthPoints
         self.rect = self.rect.move(random.randrange(3) - 1, 3)
         if pygame.sprite.spritecollideany(self, bowlGR):
             placeSP_group.add([self])
             placeSP_group.sprites()[0].kill()
-            score -= 20
-            drops_collected += 1
-            mixer.Channel(1).play(mixer.Sound('data\\expl2.mp3'))
-            print(score)
-            print('REMOVED: minusDrop')
+            healthPoints -= 1
+            if not healthPoints:
+                mixer.Channel(1).play(mixer.Sound('data\\gameOver.mp3'))
+                running = False
+            else:
+                mixer.Channel(1).play(mixer.Sound('data\\expl2.mp3'))
 
         if pygame.sprite.spritecollideany(self, protection):
             placeSP_group.add([self])
@@ -256,8 +305,6 @@ class slice(pygame.sprite.Sprite):
             mixer.Channel(1).play(mixer.Sound('data\\kill.mp3'))
 
 
-running = True
-move = 1
 while running:
     nrand = random.randint(0, 1025000)
     if nrand < 10000:
@@ -272,47 +319,52 @@ while running:
     elif 20000 <= nrand < 30000:
         slice(drops)
         print('SPAWNED: slice')
+    elif 30000 <= nrand <= 30500 and healthPoints < 3:
+        heartDrop(drops)
+
     drops.update()
     protection.update()
-    #simpleDrop
     pygame.time.delay(10)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             terminate()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                bullet(protection)
+                #bullet(protection)
                 mixer.Channel(0).play(mixer.Sound('data\\rotate.mp3'))
-                move *= -1
-                #print('MOVE CHANGED')
+                direction *= -1
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_DOWN:
-                mixer.music.stop()
+                mixer.Channel(1).play(mixer.Sound('data\\gameOver.mp3'))
                 running = False
-    if move == 1:
+    if direction == 1:
         bowl.rect.left += 5
         if bowl.rect.left >= 1000:
             bowl.rect.left = -200
-    if move == -1:
+    if direction == -1:
         bowl.rect.left -= 5
         if bowl.rect.left <= -200:
             bowl.rect.left = 1000
-    #print(bowl.rect.left)
     screen.fill(pygame.Color("royalblue"))
-    #all_sprites.draw(screen)
     bowlGR.draw(screen)
     protection.draw(screen)
     drops.draw(screen)
-    texts(score, drops_collected, posScore)
+    texts(score, drops_collected, posScore, 'middleGame')
+    screen.blit(health_image_1, (890, 0))
+    if healthPoints >= 2:
+        screen.blit(health_image_2, (780, 0))
+    if healthPoints == 3:
+        screen.blit(health_image_3, (670, 0))
     pygame.display.flip()
 
 size = (WIDTH, HEIGHT) = 600, 700
-
+mixer.music.stop()
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption('Финал!')
 running = True
 while running:
-    screen.fill(pygame.Color("green"))
+    screen.fill(pygame.Color("black"))
+    texts(score, drops_collected, posScore, 'gameOver')
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
