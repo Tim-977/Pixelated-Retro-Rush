@@ -5,7 +5,6 @@ import sys
 import pygame
 from pygame import mixer
 
-name = 'User'
 
 def load_image(name, color_key=None):
     fullname = os.path.join('data', name)
@@ -25,10 +24,8 @@ def load_image(name, color_key=None):
 
 
 def start_screen():
-    intro_text = [
-        "ЗАСТАВКА", "", "Правила игры", "Правило №1",
-        "Правило №2"
-    ]
+    global name
+    intro_text = ["ЗАСТАВКА", "", "Правила игры", "Правило №1", "Правило №2"]
     mixer.init()
     mixer.music.load('data\\start.mp3')
     mixer.music.play()
@@ -36,6 +33,8 @@ def start_screen():
     fon = pygame.transform.scale(load_image('fon.jpg'), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font('Arial.ttf', 30)
+    submit_image = pygame.image.load("data\\submit_button.png")
+    name = ""
     text_coord = 50
     for line in intro_text:
         string_rendered = font.render(line, 1, pygame.Color('white'))
@@ -45,7 +44,6 @@ def start_screen():
         intro_rect.x = 10
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
-
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -54,6 +52,29 @@ def start_screen():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     return  # начинаем игру
+                if event.unicode.isalpha():
+                    name += event.unicode
+                elif event.key == pygame.K_BACKSPACE:
+                    name = name[:-1]
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                # Get the mouse position
+                mouse_pos = pygame.mouse.get_pos()
+                # Check if the submit button was pressed
+                if submit_rect.collidepoint(mouse_pos):
+                    print("Name submitted:", name)
+                    return
+        pygame.draw.rect(screen, (200, 200, 200), (50, 200, 400, 50))
+        text = font.render(name, True, (0, 0, 0))
+        screen.blit(text, (60, 210))
+
+        # Draw the submit button
+        #submit_rect = pygame.draw.rect(screen, (0, 200, 0),
+        #                               (200, 300, 100, 50))
+        #submit_rect = submit_image.get_rect(topleft=(200, 300))
+        #submit_text = font.render("Submit", True, (255, 255, 255))
+        #screen.blit(submit_text, (215, 315))
+        submit_rect = submit_image.get_rect(topleft=(200, 300))
+        screen.blit(submit_image, submit_rect)
         pygame.display.flip()
 
 
@@ -70,7 +91,7 @@ def texts(score, drops_collected, ps, phase):
             scoretext = font.render(
                 f"Score: {str(score)} | Accuracy: {str(round(ps / (drops_collected) * 100))}%",
                 1, (200, 0, 0))
-            screen.blit(scoretext, (10, 10))    
+            screen.blit(scoretext, (10, 10))
         else:
             scoretext = font.render(
                 f"Score: {str(score)} | Accuracy: {str(drops_collected)}%", 1,
@@ -78,14 +99,14 @@ def texts(score, drops_collected, ps, phase):
             screen.blit(scoretext, (10, 10))
     elif phase == 'gameOver':
         if drops_collected:
-            gameOverText = font.render(f"GAME OVER",1, (200, 0, 0))
+            gameOverText = font.render(f"GAME OVER", 1, (200, 0, 0))
             scoretext = font.render(
                 f"Score: {str(score)} | Accuracy: {str(round(ps / (drops_collected) * 100))}%",
                 1, (200, 0, 0))
             screen.blit(scoretext, (80, 50))
             screen.blit(gameOverText, (200, 10))
         else:
-            gameOverText = font.render(f"GAME OVER",1, (200, 0, 0))
+            gameOverText = font.render(f"GAME OVER", 1, (200, 0, 0))
             scoretext = font.render(
                 f"Score: {str(score)} | Accuracy: {str(drops_collected)}%", 1,
                 (200, 0, 0))
@@ -375,4 +396,5 @@ pygame.quit()
 
 import dbparser as dbp
 
-dbp.insert_result('records.db', name, score, round(posScore / (drops_collected) * 100))
+dbp.insert_result('records.db', name, score,
+                  round(posScore / (drops_collected) * 100))
