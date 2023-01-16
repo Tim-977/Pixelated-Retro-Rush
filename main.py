@@ -50,7 +50,7 @@ def start_screen():
                 mixer.music.stop()
                 terminate()
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
+                if event.key == pygame.K_l:
                     return  # начинаем игру
                 if event.unicode.isalpha():
                     name += event.unicode
@@ -60,7 +60,7 @@ def start_screen():
                 # Get the mouse position
                 mouse_pos = pygame.mouse.get_pos()
                 # Check if the submit button was pressed
-                if submit_rect.collidepoint(mouse_pos):
+                if name and submit_rect.collidepoint(mouse_pos):
                     print("Name submitted:", name)
                     return
         pygame.draw.rect(screen, (200, 200, 200), (50, 200, 400, 50))
@@ -148,23 +148,94 @@ health_image_2 = pygame.transform.scale(load_image("heart_label.png", -1),
                                         (100, 100))
 health_image_3 = pygame.transform.scale(load_image("heart_label.png", -1),
                                         (100, 100))
+bullet_image_cross = pygame.transform.scale(load_image("bullet_label_cross.png", -1),
+                                        (100, 100))
 screen.blit(health_image_1, (900, 100))
 screen.blit(health_image_2, (900, 100))
 screen.blit(health_image_3, (900, 100))
+screen.blit(bullet_image_cross, (900, 100))
 pygame.display.flip()
 running = True
 direction = 1
 
 
-class bullet(pygame.sprite.Sprite):
+class bullet_1(pygame.sprite.Sprite):
     image = pygame.transform.scale(load_image("bullet.png", -1), (30, 95))
 
     def __init__(self, *group):
         super().__init__(*group)
-        self.image = bullet.image
+        self.image = bullet_1.image
         self.rect = self.image.get_rect()
         self.rect.bottom = bowl.rect.top
         self.rect.left = bowl.rect.left + 100
+
+    def update(self):
+        global score
+        global posScore
+        global drops_collected
+        self.rect = self.rect.move(0, -12)
+
+
+class bullet_2(pygame.sprite.Sprite):
+    image = pygame.transform.scale(load_image("bullet.png", -1), (30, 95))
+
+    def __init__(self, *group):
+        super().__init__(*group)
+        self.image = bullet_2.image
+        self.rect = self.image.get_rect()
+        self.rect.bottom = bowl.rect.top
+        self.rect.left = bowl.rect.left - 100
+
+    def update(self):
+        global score
+        global posScore
+        global drops_collected
+        self.rect = self.rect.move(0, -12)
+
+
+class bullet_3(pygame.sprite.Sprite):
+    image = pygame.transform.scale(load_image("bullet.png", -1), (30, 95))
+
+    def __init__(self, *group):
+        super().__init__(*group)
+        self.image = bullet_3.image
+        self.rect = self.image.get_rect()
+        self.rect.bottom = bowl.rect.top
+        self.rect.left = bowl.rect.left + 300
+
+    def update(self):
+        global score
+        global posScore
+        global drops_collected
+        self.rect = self.rect.move(0, -12)
+
+
+class bullet_4(pygame.sprite.Sprite):
+    image = pygame.transform.scale(load_image("bullet.png", -1), (30, 95))
+
+    def __init__(self, *group):
+        super().__init__(*group)
+        self.image = bullet_4.image
+        self.rect = self.image.get_rect()
+        self.rect.bottom = bowl.rect.top
+        self.rect.left = bowl.rect.left - 5
+
+    def update(self):
+        global score
+        global posScore
+        global drops_collected
+        self.rect = self.rect.move(0, -12)
+
+
+class bullet_5(pygame.sprite.Sprite):
+    image = pygame.transform.scale(load_image("bullet.png", -1), (30, 95))
+
+    def __init__(self, *group):
+        super().__init__(*group)
+        self.image = bullet_5.image
+        self.rect = self.image.get_rect()
+        self.rect.bottom = bowl.rect.top
+        self.rect.left = bowl.rect.left + 200
 
     def update(self):
         global score
@@ -327,6 +398,9 @@ class slice(pygame.sprite.Sprite):
             mixer.Channel(1).play(mixer.Sound('data\\kill.mp3'))
 
 
+cooldown_time = 3
+last_press_time = 0
+
 while running:
     nrand = random.randint(0, 1025000)
     if nrand < 10000:
@@ -352,13 +426,23 @@ while running:
             terminate()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                #bullet(protection)
                 mixer.Channel(0).play(mixer.Sound('data\\rotate.mp3'))
                 direction *= -1
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_DOWN:
                 mixer.Channel(1).play(mixer.Sound('data\\gameOver.mp3'))
                 running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_x:
+                current_time = pygame.time.get_ticks()
+                if current_time - last_press_time > cooldown_time * 1000:
+                    
+                    bullet_1(protection)
+                    bullet_2(protection)
+                    bullet_3(protection)
+                    bullet_4(protection)
+                    bullet_5(protection)
+                    last_press_time = current_time
     if direction == 1:
         bowl.rect.left += 5
         if bowl.rect.left >= 1000:
@@ -377,6 +461,7 @@ while running:
         screen.blit(health_image_2, (780, 0))
     if healthPoints == 3:
         screen.blit(health_image_3, (670, 0))
+        screen.blit(bullet_image_cross, (550, 10))
     pygame.display.flip()
 
 size = (WIDTH, HEIGHT) = 600, 700
