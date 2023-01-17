@@ -148,6 +148,12 @@ health_image_2 = pygame.transform.scale(load_image("heart_label.png", -1),
                                         (100, 100))
 health_image_3 = pygame.transform.scale(load_image("heart_label.png", -1),
                                         (100, 100))
+died_image_1 = pygame.transform.scale(load_image("dead_label.png", -1),
+                                      (100, 100))
+died_image_2 = pygame.transform.scale(load_image("dead_label.png", -1),
+                                      (100, 100))
+died_image_3 = pygame.transform.scale(load_image("dead_label.png", -1),
+                                      (100, 100))
 bullet_image_cross = pygame.transform.scale(
     load_image("bullet_label_cross.png", -1), (100, 100))
 bullet_image_tick = pygame.transform.scale(
@@ -466,11 +472,18 @@ while running:
         screen.blit(bullet_image_tick, (550, 10))
     else:
         screen.blit(bullet_image_cross, (550, 10))
-    if healthPoints >= 2:
+    if healthPoints == 1:
+        screen.blit(health_image_1, (890, 0))
+        screen.blit(died_image_2, (780, 0))
+        screen.blit(died_image_1, (670, 0))
+    if healthPoints == 2:
+        screen.blit(health_image_1, (890, 0))
         screen.blit(health_image_2, (780, 0))
+        screen.blit(died_image_1, (670, 0))
     if healthPoints == 3:
+        screen.blit(health_image_1, (890, 0))
+        screen.blit(health_image_2, (780, 0))
         screen.blit(health_image_3, (670, 0))
-        #screen.blit(bullet_image_cross, (550, 10))
     pygame.display.flip()
 
 size = (WIDTH, HEIGHT) = 600, 700
