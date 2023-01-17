@@ -148,8 +148,10 @@ health_image_2 = pygame.transform.scale(load_image("heart_label.png", -1),
                                         (100, 100))
 health_image_3 = pygame.transform.scale(load_image("heart_label.png", -1),
                                         (100, 100))
-bullet_image_cross = pygame.transform.scale(load_image("bullet_label_cross.png", -1),
-                                        (100, 100))
+bullet_image_cross = pygame.transform.scale(
+    load_image("bullet_label_cross.png", -1), (100, 100))
+bullet_image_tick = pygame.transform.scale(
+    load_image("bullet_image_tick.png", -1), (100, 100))
 screen.blit(health_image_1, (900, 100))
 screen.blit(health_image_2, (900, 100))
 screen.blit(health_image_3, (900, 100))
@@ -400,6 +402,7 @@ class slice(pygame.sprite.Sprite):
 
 cooldown_time = 3
 last_press_time = 0
+isReady = False
 
 while running:
     nrand = random.randint(0, 1025000)
@@ -432,17 +435,19 @@ while running:
             if event.key == pygame.K_DOWN:
                 mixer.Channel(1).play(mixer.Sound('data\\gameOver.mp3'))
                 running = False
+        current_time = pygame.time.get_ticks()
+        if current_time - last_press_time > cooldown_time * 1000:
+            isReady = True
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_x:
-                current_time = pygame.time.get_ticks()
-                if current_time - last_press_time > cooldown_time * 1000:
-                    
+                if isReady:
                     bullet_1(protection)
                     bullet_2(protection)
                     bullet_3(protection)
                     bullet_4(protection)
                     bullet_5(protection)
                     last_press_time = current_time
+                    isReady = False
     if direction == 1:
         bowl.rect.left += 5
         if bowl.rect.left >= 1000:
@@ -457,11 +462,15 @@ while running:
     drops.draw(screen)
     texts(score, drops_collected, posScore, 'middleGame')
     screen.blit(health_image_1, (890, 0))
+    if isReady:
+        screen.blit(bullet_image_tick, (550, 10))
+    else:
+        screen.blit(bullet_image_cross, (550, 10))
     if healthPoints >= 2:
         screen.blit(health_image_2, (780, 0))
     if healthPoints == 3:
         screen.blit(health_image_3, (670, 0))
-        screen.blit(bullet_image_cross, (550, 10))
+        #screen.blit(bullet_image_cross, (550, 10))
     pygame.display.flip()
 
 size = (WIDTH, HEIGHT) = 600, 700
