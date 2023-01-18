@@ -5,6 +5,12 @@ import sys
 import pygame
 from pygame import mixer
 
+#TODO:
+#   Animation
+#   Requirements.txt
+#   Design
+#   Several levels
+#   Make cooldown spawner
 
 def load_image(name, color_key=None):
     fullname = os.path.join('data', name)
@@ -135,13 +141,14 @@ mixer.init()
 pygame.mixer.music.load('data\\fight.mp3')
 pygame.mixer.music.play(-1)
 
-bowl_image = pygame.transform.scale(load_image("bowl.png", -1), (200, 100))
+bowl_image = pygame.transform.scale(load_image("bowl.png"), (200, 100))
 bowl = pygame.sprite.Sprite(bowlGR)
 bowl.image = bowl_image
 bowl.rect = bowl.image.get_rect()
 bowl.rect.top = 600
 bowl.rect.left = 400
-
+backGround_image = pygame.transform.scale(load_image("backGround.png", -1),
+                                        (1000, 700))
 health_image_1 = pygame.transform.scale(load_image("heart_label.png", -1),
                                         (100, 100))
 health_image_2 = pygame.transform.scale(load_image("heart_label.png", -1),
@@ -259,8 +266,8 @@ class heartDrop(pygame.sprite.Sprite):
         super().__init__(*group)
         self.image = heartDrop.image
         self.rect = self.image.get_rect()
-        self.rect.top = 50
-        self.rect.left = random.randint(50, 900)
+        self.rect.top = 115
+        self.rect.left = random.randint(50, 875)
 
     def update(self):
         global score
@@ -289,8 +296,8 @@ class twoPointDrop(pygame.sprite.Sprite):
         super().__init__(*group)
         self.image = twoPointDrop.image
         self.rect = self.image.get_rect()
-        self.rect.top = 50
-        self.rect.left = random.randint(50, 900)
+        self.rect.top = 115
+        self.rect.left = random.randint(50, 875)
 
     def update(self):
         global score
@@ -321,8 +328,8 @@ class fourPointDrop(pygame.sprite.Sprite):
         super().__init__(*group)
         self.image = fourPointDrop.image
         self.rect = self.image.get_rect()
-        self.rect.top = 50
-        self.rect.left = random.randint(50, 900)
+        self.rect.top = 115
+        self.rect.left = random.randint(50, 875)
 
     def update(self):
         global score
@@ -352,8 +359,8 @@ class minusDrop(pygame.sprite.Sprite):
         super().__init__(*group)
         self.image = minusDrop.image
         self.rect = self.image.get_rect()
-        self.rect.top = 50
-        self.rect.left = random.randint(50, 900)
+        self.rect.top = 115
+        self.rect.left = random.randint(50, 875)
 
     def update(self):
         global score
@@ -384,8 +391,8 @@ class slice(pygame.sprite.Sprite):
         super().__init__(*group)
         self.image = slice.image
         self.rect = self.image.get_rect()
-        self.rect.top = 50
-        self.rect.left = random.randint(50, 900)
+        self.rect.top = 115
+        self.rect.left = random.randint(50, 875)
 
     def update(self):
         global score
@@ -463,6 +470,7 @@ while running:
         if bowl.rect.left <= -200:
             bowl.rect.left = 1000
     screen.fill(pygame.Color("royalblue"))
+    screen.blit(backGround_image, (0, 0))
     bowlGR.draw(screen)
     protection.draw(screen)
     drops.draw(screen)
