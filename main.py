@@ -403,7 +403,7 @@ class slice(pygame.sprite.Sprite):
             mixer.Channel(1).play(mixer.Sound('data\\kill.mp3'))
 
 
-cooldown_time = 3
+cooldown_time = 10
 last_press_time = 0
 isReady = False
 
