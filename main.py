@@ -5,12 +5,15 @@ import sys
 import pygame
 from pygame import mixer
 
+import dbparser as dbp
+
 #TODO:
 #   Animation
 #   Requirements.txt
 #   Design
 #   Several levels
 #   Make cooldown spawner
+
 
 def load_image(name, color_key=None):
     fullname = os.path.join('data', name)
@@ -31,25 +34,19 @@ def load_image(name, color_key=None):
 
 def start_screen():
     global name
-    intro_text = ["ЗАСТАВКА", "", "Правила игры", "Правило №1", "Правило №2"]
+    #intro_text = ["ЗАСТАВКА", "", "Правила игры", "Правило №1", "Правило №2"]
     mixer.init()
     mixer.music.load('data\\start.mp3')
     mixer.music.play()
     pygame.font.init()
-    fon = pygame.transform.scale(load_image('fon.jpg'), (WIDTH, HEIGHT))
+    fon = pygame.transform.scale(load_image('startbg.png'), (WIDTH, HEIGHT))
+    gamename = pygame.transform.scale(load_image('gamename.png', -1),
+                                      (953, 139))
     screen.blit(fon, (0, 0))
+    screen.blit(gamename, (17, 13))
     font = pygame.font.Font('Arial.ttf', 30)
-    submit_image = pygame.image.load("data\\submit_button.png")
+    submit_image = pygame.image.load("data\\play.png")
     name = ""
-    text_coord = 50
-    for line in intro_text:
-        string_rendered = font.render(line, 1, pygame.Color('white'))
-        intro_rect = string_rendered.get_rect()
-        text_coord += 10
-        intro_rect.top = text_coord
-        intro_rect.x = 10
-        text_coord += intro_rect.height
-        screen.blit(string_rendered, intro_rect)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -58,7 +55,7 @@ def start_screen():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_l:
                     return  # начинаем игру
-                if event.unicode.isalpha():
+                if event.unicode.isalpha() and len(name) < 27:
                     name += event.unicode
                 elif event.key == pygame.K_BACKSPACE:
                     name = name[:-1]
@@ -69,17 +66,11 @@ def start_screen():
                 if name and submit_rect.collidepoint(mouse_pos):
                     print("Name submitted:", name)
                     return
-        pygame.draw.rect(screen, (200, 200, 200), (50, 200, 400, 50))
+        pygame.draw.rect(screen, 'forest green', (100, 223, 405, 65))
         text = font.render(name, True, (0, 0, 0))
-        screen.blit(text, (60, 210))
+        screen.blit(text, (120, 238))
 
-        # Draw the submit button
-        #submit_rect = pygame.draw.rect(screen, (0, 200, 0),
-        #                               (200, 300, 100, 50))
-        #submit_rect = submit_image.get_rect(topleft=(200, 300))
-        #submit_text = font.render("Submit", True, (255, 255, 255))
-        #screen.blit(submit_text, (215, 315))
-        submit_rect = submit_image.get_rect(topleft=(200, 300))
+        submit_rect = submit_image.get_rect(topleft=(100, 373))
         screen.blit(submit_image, submit_rect)
         pygame.display.flip()
 
@@ -109,14 +100,14 @@ def texts(score, drops_collected, ps, phase):
             scoretext = font.render(
                 f"Score: {str(score)} | Accuracy: {str(round(ps / (drops_collected) * 100))}%",
                 1, (200, 0, 0))
-            screen.blit(scoretext, (80, 50))
+            screen.blit(scoretext, (20, 50))
             screen.blit(gameOverText, (200, 10))
         else:
             gameOverText = font.render(f"GAME OVER", 1, (200, 0, 0))
             scoretext = font.render(
                 f"Score: {str(score)} | Accuracy: {str(drops_collected)}%", 1,
                 (200, 0, 0))
-            screen.blit(scoretext, (80, 50))
+            screen.blit(scoretext, (20, 50))
             screen.blit(gameOverText, (200, 10))
 
 
@@ -136,19 +127,18 @@ placeSP_group = pygame.sprite.OrderedUpdates()
 bowlGR = pygame.sprite.Group()
 drops = pygame.sprite.Group()
 protection = pygame.sprite.Group()
-
 mixer.init()
 pygame.mixer.music.load('data\\fight.mp3')
 pygame.mixer.music.play(-1)
 
-bowl_image = pygame.transform.scale(load_image("bowl.png"), (200, 100))
+bowl_image = pygame.transform.scale(load_image("bowl.png", -1), (200, 100))
 bowl = pygame.sprite.Sprite(bowlGR)
 bowl.image = bowl_image
 bowl.rect = bowl.image.get_rect()
 bowl.rect.top = 600
 bowl.rect.left = 400
-backGround_image = pygame.transform.scale(load_image("backGround.png", -1),
-                                        (1000, 700))
+backGround_image = pygame.transform.scale(load_image("backGround.png"),
+                                          (1000, 700))
 health_image_1 = pygame.transform.scale(load_image("heart_label.png", -1),
                                         (100, 100))
 health_image_2 = pygame.transform.scale(load_image("heart_label.png", -1),
@@ -508,8 +498,6 @@ while running:
     pygame.display.flip()
 
 pygame.quit()
-
-import dbparser as dbp
 
 dbp.insert_result('records.db', name, score,
                   round(posScore / (drops_collected) * 100))
