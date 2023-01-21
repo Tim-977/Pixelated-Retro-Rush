@@ -3,13 +3,11 @@ import random
 import sys
 
 import pygame
-import pygame.animation as animation
 from pygame import mixer
 
 import dbparser as dbp
 
 #TODO:
-#   Animation
 #   Requirements.txt
 #   Comments
 #   Sort data
@@ -64,7 +62,6 @@ def start_screen():
                 mouse_pos = pygame.mouse.get_pos()
                 # Check if the submit button was pressed
                 if name and submit_rect.collidepoint(mouse_pos):
-                    print("Name submitted:", name)
                     return
         pygame.draw.rect(screen, 'forest green', (100, 223, 405, 65))
         text = font.render(name, True, (0, 0, 0))
@@ -127,12 +124,24 @@ mixer.init()
 pygame.mixer.music.load('data\\fight.mp3')
 pygame.mixer.music.play(-1)
 
-bowl_image = pygame.transform.scale(load_image("bowl.png", -1), (200, 100))
 bowl = pygame.sprite.Sprite(bowlGR)
-bowl.image = bowl_image
+frames = [
+    pygame.transform.scale(load_image("bowl_frame1.png", -1), (200, 100)),
+    pygame.transform.scale(load_image("bowl_frame2.png", -1), (200, 100)),
+    pygame.transform.scale(load_image("bowl_frame3.png", -1), (200, 100)),
+    pygame.transform.scale(load_image("bowl_frame4.png", -1), (200, 100)),
+    pygame.transform.scale(load_image("bowl_frame5.png", -1), (200, 100)),
+    pygame.transform.scale(load_image("bowl_frame6.png", -1), (200, 100)),
+    pygame.transform.scale(load_image("bowl_frame7.png", -1), (200, 100))
+]
+bowl.image = frames[0]
 bowl.rect = bowl.image.get_rect()
 bowl.rect.top = 600
 bowl.rect.left = 400
+bowl.current_frame = 0
+bowl.fps = 15
+bowl.anim_time = pygame.time.get_ticks()
+
 backGround_image = pygame.transform.scale(load_image("backGround.png"),
                                           (1000, 700))
 end_image = pygame.transform.scale(load_image("endbg.png"), (600, 700))
@@ -298,8 +307,6 @@ class twoPointDrop(pygame.sprite.Sprite):
             posScore += 1
             drops_collected += 1
             mixer.Channel(1).play(mixer.Sound('data\\coin.mp3'))
-            print(score)
-            print('REMOVED: twoPointDrop')
 
         if pygame.sprite.spritecollideany(self, protection):
             placeSP_group.add([self])
@@ -330,8 +337,6 @@ class fourPointDrop(pygame.sprite.Sprite):
             posScore += 1
             drops_collected += 1
             mixer.Channel(1).play(mixer.Sound('data\\coin.mp3'))
-            print(score)
-            print('REMOVED: fourPointDrop')
 
         if pygame.sprite.spritecollideany(self, protection):
             placeSP_group.add([self])
@@ -391,9 +396,6 @@ class slice(pygame.sprite.Sprite):
             score //= 2
             drops_collected += 1
             mixer.Channel(1).play(mixer.Sound('data\\expl1.mp3'))
-            print(score)
-            print('REMOVED: slice')
-
         if pygame.sprite.spritecollideany(self, protection):
             placeSP_group.add([self])
             placeSP_group.sprites()[0].kill()
@@ -408,21 +410,21 @@ while running:
     nrand = random.randint(0, 1025000)
     if nrand < 10000:
         twoPointDrop(drops)
-        print('SPAWNED: twoPointDrop')
     elif 10000 <= nrand < 15000:
         fourPointDrop(drops)
-        print('SPAWNED: fourPointDrop')
     elif 15000 <= nrand < 20000:
         minusDrop(drops)
-        print('SPAWNED: minusDrop')
     elif 20000 <= nrand < 30000:
         slice(drops)
-        print('SPAWNED: slice')
     elif 30000 <= nrand <= 30500 and healthPoints < 3:
         heartDrop(drops)
 
     drops.update()
     protection.update()
+    if pygame.time.get_ticks() - bowl.anim_time > 1000 / bowl.fps:
+        bowl.anim_time = pygame.time.get_ticks()
+        bowl.current_frame = (bowl.current_frame + 1) % len(frames)
+        bowl.image = frames[bowl.current_frame]
     pygame.time.delay(10)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
