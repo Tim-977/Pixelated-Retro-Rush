@@ -9,14 +9,10 @@ import dbparser as dbp
 
 # Import required modules
 
-#TODO:
-#   Requirements.txt
-#   Sort data
-
 
 # Helps with loading image
 def load_image(name, color_key=None):
-    fullname = os.path.join('data', name)
+    fullname = os.path.join('data\\pics', name)
     try:
         image = pygame.image.load(fullname).convert()
     except pygame.error as message:
@@ -36,7 +32,7 @@ def load_image(name, color_key=None):
 def start_screen():
     global name  # Player's name
     mixer.init()  # Initialize music
-    mixer.music.load('data\\start.mp3')
+    mixer.music.load('data\\music\\start.mp3')
     mixer.music.play()
     pygame.font.init()
     # images loading for the window:
@@ -46,8 +42,8 @@ def start_screen():
     screen.blit(fon, (0, 0))
     screen.blit(gamename, (17, 13))
     # Font initialization
-    font = pygame.font.Font('data\\Arial.ttf', 30)
-    submit_image = pygame.image.load("data\\play.png")
+    font = pygame.font.Font('data\\fonts\\Arial.ttf', 30)
+    submit_image = pygame.image.load("data\\pics\\play.png")
     name = ""
     while True:  # Main loop
         for event in pygame.event.get():
@@ -83,7 +79,7 @@ def terminate():
 
 def texts(score, drops_collected, ps, phase):  # Shows the score
     pygame.font.init()
-    font = pygame.font.Font("data\\BoldPixelSans.ttf", 30)
+    font = pygame.font.Font("data\\fonts\\BoldPixelSans.ttf", 30)
     if phase == 'middleGame':  # Checks is the game in process or over
         if drops_collected:
             scoretext = font.render(  # Renders text
@@ -126,7 +122,7 @@ drops = pygame.sprite.Group()
 protection = pygame.sprite.Group()
 
 mixer.init()  # Loads music
-pygame.mixer.music.load('data\\fight.mp3')
+pygame.mixer.music.load('data\\music\\fight.mp3')
 pygame.mixer.music.play(-1)
 
 bowl = pygame.sprite.Sprite(bowlGR)
@@ -290,13 +286,13 @@ class heartDrop(pygame.sprite.Sprite):
             placeSP_group.sprites()[0].kill()
             if healthPoints < 3:
                 healthPoints += 1
-            mixer.Channel(1).play(mixer.Sound('data\\health.mp3'))
+            mixer.Channel(1).play(mixer.Sound('data\\music\\health.mp3'))
 
         if pygame.sprite.spritecollideany(
                 self, protection):  # If bowl touches a fire
             placeSP_group.add([self])
             placeSP_group.sprites()[0].kill()
-            mixer.Channel(1).play(mixer.Sound('data\\kill.mp3'))
+            mixer.Channel(1).play(mixer.Sound('data\\music\\kill.mp3'))
 
 
 class twoPointDrop(pygame.sprite.Sprite):
@@ -323,12 +319,12 @@ class twoPointDrop(pygame.sprite.Sprite):
             score += 2
             posScore += 1
             drops_collected += 1
-            mixer.Channel(1).play(mixer.Sound('data\\coin.mp3'))
+            mixer.Channel(1).play(mixer.Sound('data\\music\\coin.mp3'))
         # If bullet kills
         if pygame.sprite.spritecollideany(self, protection):
             placeSP_group.add([self])
             placeSP_group.sprites()[0].kill()
-            mixer.Channel(1).play(mixer.Sound('data\\kill.mp3'))
+            mixer.Channel(1).play(mixer.Sound('data\\music\\kill.mp3'))
 
 
 class fourPointDrop(pygame.sprite.Sprite):
@@ -355,12 +351,12 @@ class fourPointDrop(pygame.sprite.Sprite):
             score += 4
             posScore += 1
             drops_collected += 1
-            mixer.Channel(1).play(mixer.Sound('data\\coin.mp3'))
+            mixer.Channel(1).play(mixer.Sound('data\\music\\coin.mp3'))
         # If bullet kills
         if pygame.sprite.spritecollideany(self, protection):
             placeSP_group.add([self])
             placeSP_group.sprites()[0].kill()
-            mixer.Channel(1).play(mixer.Sound('data\\kill.mp3'))
+            mixer.Channel(1).play(mixer.Sound('data\\music\\kill.mp3'))
 
 
 class minusDrop(pygame.sprite.Sprite):
@@ -386,15 +382,15 @@ class minusDrop(pygame.sprite.Sprite):
             placeSP_group.sprites()[0].kill()
             healthPoints -= 1
             if not healthPoints:
-                mixer.Channel(1).play(mixer.Sound('data\\gameOver.mp3'))
+                mixer.Channel(1).play(mixer.Sound('data\\music\\gameOver.mp3'))
                 running = False
             else:
-                mixer.Channel(1).play(mixer.Sound('data\\expl2.mp3'))
+                mixer.Channel(1).play(mixer.Sound('data\\music\\expl2.mp3'))
         # If bullet kills
         if pygame.sprite.spritecollideany(self, protection):
             placeSP_group.add([self])
             placeSP_group.sprites()[0].kill()
-            mixer.Channel(1).play(mixer.Sound('data\\kill.mp3'))
+            mixer.Channel(1).play(mixer.Sound('data\\music\\kill.mp3'))
 
 
 class slice(pygame.sprite.Sprite):
@@ -418,12 +414,12 @@ class slice(pygame.sprite.Sprite):
             placeSP_group.sprites()[0].kill()
             score //= 2
             drops_collected += 1
-            mixer.Channel(1).play(mixer.Sound('data\\expl1.mp3'))
+            mixer.Channel(1).play(mixer.Sound('data\\music\\expl1.mp3'))
         # If bullet kills
         if pygame.sprite.spritecollideany(self, protection):
             placeSP_group.add([self])
             placeSP_group.sprites()[0].kill()
-            mixer.Channel(1).play(mixer.Sound('data\\kill.mp3'))
+            mixer.Channel(1).play(mixer.Sound('data\\music\\kill.mp3'))
 
 
 cooldown_time = 10
@@ -456,7 +452,7 @@ while running:  # Loop of the main window
             terminate()
         if event.type == pygame.KEYDOWN:  # Bowl direction reverse
             if event.key == pygame.K_SPACE:
-                mixer.Channel(0).play(mixer.Sound('data\\rotate.mp3'))
+                mixer.Channel(0).play(mixer.Sound('data\\music\\rotate.mp3'))
                 direction *= -1
         current_time = pygame.time.get_ticks()
         if current_time - last_press_time > cooldown_time * 1000:
