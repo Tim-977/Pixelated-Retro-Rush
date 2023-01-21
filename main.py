@@ -3,6 +3,7 @@ import random
 import sys
 
 import pygame
+import pygame.animation as animation
 from pygame import mixer
 
 import dbparser as dbp
@@ -10,9 +11,8 @@ import dbparser as dbp
 #TODO:
 #   Animation
 #   Requirements.txt
-#   Design
-#   Several levels
-#   Make cooldown spawner
+#   Comments
+#   Sort data
 
 
 def load_image(name, color_key=None):
@@ -53,7 +53,7 @@ def start_screen():
                 mixer.music.stop()
                 terminate()
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_l:
+                if event.key == pygame.K_DOWN:
                     return  # начинаем игру
                 if event.unicode.isalpha() and len(name) < 27:
                     name += event.unicode
@@ -96,19 +96,15 @@ def texts(score, drops_collected, ps, phase):
             screen.blit(scoretext, (10, 10))
     elif phase == 'gameOver':
         if drops_collected:
-            gameOverText = font.render(f"GAME OVER", 1, (200, 0, 0))
             scoretext = font.render(
                 f"Score: {str(score)} | Accuracy: {str(round(ps / (drops_collected) * 100))}%",
                 1, (200, 0, 0))
-            screen.blit(scoretext, (20, 50))
-            screen.blit(gameOverText, (200, 10))
+            screen.blit(scoretext, (20, 150))
         else:
-            gameOverText = font.render(f"GAME OVER", 1, (200, 0, 0))
             scoretext = font.render(
                 f"Score: {str(score)} | Accuracy: {str(drops_collected)}%", 1,
                 (200, 0, 0))
-            screen.blit(scoretext, (20, 50))
-            screen.blit(gameOverText, (200, 10))
+            screen.blit(scoretext, (20, 150))
 
 
 size = (WIDTH, HEIGHT) = 1000, 700
@@ -119,7 +115,7 @@ drops_collected = 0
 healthPoints = 3
 
 screen = pygame.display.set_mode(size)
-pygame.display.set_caption('Бабиджонка!')
+pygame.display.set_caption('Pixelated Retro Rush')
 
 start_screen()
 
@@ -139,6 +135,7 @@ bowl.rect.top = 600
 bowl.rect.left = 400
 backGround_image = pygame.transform.scale(load_image("backGround.png"),
                                           (1000, 700))
+end_image = pygame.transform.scale(load_image("endbg.png"), (600, 700))
 health_image_1 = pygame.transform.scale(load_image("heart_label.png", -1),
                                         (100, 100))
 health_image_2 = pygame.transform.scale(load_image("heart_label.png", -1),
@@ -484,13 +481,14 @@ while running:
         screen.blit(health_image_3, (670, 0))
     pygame.display.flip()
 
-size = (WIDTH, HEIGHT) = 600, 700
+size = (WIDTH, HEIGHT) = 600, 200
 mixer.music.stop()
 screen = pygame.display.set_mode(size)
-pygame.display.set_caption('Финал!')
+pygame.display.set_caption('Game Over!')
 running = True
 while running:
     screen.fill(pygame.Color("black"))
+    screen.blit(end_image, (0, 0))
     texts(score, drops_collected, posScore, 'gameOver')
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
