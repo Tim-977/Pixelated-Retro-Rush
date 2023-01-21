@@ -11,7 +11,6 @@ import dbparser as dbp
 
 #TODO:
 #   Requirements.txt
-#   Comments
 #   Sort data
 
 
@@ -47,7 +46,7 @@ def start_screen():
     screen.blit(fon, (0, 0))
     screen.blit(gamename, (17, 13))
     # Font initialization
-    font = pygame.font.Font('Arial.ttf', 30)
+    font = pygame.font.Font('data\\Arial.ttf', 30)
     submit_image = pygame.image.load("data\\play.png")
     name = ""
     while True:  # Main loop
@@ -84,7 +83,7 @@ def terminate():
 
 def texts(score, drops_collected, ps, phase):  # Shows the score
     pygame.font.init()
-    font = pygame.font.Font("BoldPixelSans.ttf", 30)
+    font = pygame.font.Font("data\\BoldPixelSans.ttf", 30)
     if phase == 'middleGame':  # Checks is the game in process or over
         if drops_collected:
             scoretext = font.render(  # Renders text
