@@ -189,6 +189,9 @@ class bullet_1(pygame.sprite.Sprite):
         global posScore
         global drops_collected
         self.rect = self.rect.move(0, -12)  # Movement
+        if self.rect.top < 0:
+            placeSP_group.add([self])
+            placeSP_group.sprites()[0].kill()
 
 
 class bullet_2(pygame.sprite.Sprite):
@@ -207,6 +210,9 @@ class bullet_2(pygame.sprite.Sprite):
         global posScore
         global drops_collected
         self.rect = self.rect.move(0, -12)  # Movement
+        if self.rect.top < 0:
+            placeSP_group.add([self])
+            placeSP_group.sprites()[0].kill()
 
 
 class bullet_3(pygame.sprite.Sprite):
@@ -225,6 +231,9 @@ class bullet_3(pygame.sprite.Sprite):
         global posScore
         global drops_collected
         self.rect = self.rect.move(0, -12)  # Movement
+        if self.rect.top < 0:
+            placeSP_group.add([self])
+            placeSP_group.sprites()[0].kill()
 
 
 class bullet_4(pygame.sprite.Sprite):
@@ -243,6 +252,9 @@ class bullet_4(pygame.sprite.Sprite):
         global posScore
         global drops_collected
         self.rect = self.rect.move(0, -12)  # Movement
+        if self.rect.top < 0:
+            placeSP_group.add([self])
+            placeSP_group.sprites()[0].kill()
 
 
 class bullet_5(pygame.sprite.Sprite):
@@ -261,6 +273,9 @@ class bullet_5(pygame.sprite.Sprite):
         global posScore
         global drops_collected
         self.rect = self.rect.move(0, -12)  # Movement
+        if self.rect.top < 0:
+            placeSP_group.add([self])
+            placeSP_group.sprites()[0].kill()
 
 
 class heartDrop(pygame.sprite.Sprite):
@@ -293,6 +308,9 @@ class heartDrop(pygame.sprite.Sprite):
             placeSP_group.add([self])
             placeSP_group.sprites()[0].kill()
             mixer.Channel(1).play(mixer.Sound('data\\music\\kill.mp3'))
+        if self.rect.top > 1000:
+            placeSP_group.add([self])
+            placeSP_group.sprites()[0].kill()
 
 
 class twoPointDrop(pygame.sprite.Sprite):
@@ -325,6 +343,9 @@ class twoPointDrop(pygame.sprite.Sprite):
             placeSP_group.add([self])
             placeSP_group.sprites()[0].kill()
             mixer.Channel(1).play(mixer.Sound('data\\music\\kill.mp3'))
+        if self.rect.top > 1000:
+            placeSP_group.add([self])
+            placeSP_group.sprites()[0].kill()
 
 
 class fourPointDrop(pygame.sprite.Sprite):
@@ -357,6 +378,9 @@ class fourPointDrop(pygame.sprite.Sprite):
             placeSP_group.add([self])
             placeSP_group.sprites()[0].kill()
             mixer.Channel(1).play(mixer.Sound('data\\music\\kill.mp3'))
+        if self.rect.top > 1000:
+            placeSP_group.add([self])
+            placeSP_group.sprites()[0].kill()
 
 
 class minusDrop(pygame.sprite.Sprite):
@@ -391,6 +415,9 @@ class minusDrop(pygame.sprite.Sprite):
             placeSP_group.add([self])
             placeSP_group.sprites()[0].kill()
             mixer.Channel(1).play(mixer.Sound('data\\music\\kill.mp3'))
+        if self.rect.top > 1000:
+            placeSP_group.add([self])
+            placeSP_group.sprites()[0].kill()
 
 
 class slice(pygame.sprite.Sprite):
@@ -420,6 +447,9 @@ class slice(pygame.sprite.Sprite):
             placeSP_group.add([self])
             placeSP_group.sprites()[0].kill()
             mixer.Channel(1).play(mixer.Sound('data\\music\\kill.mp3'))
+        if self.rect.top > 1000:
+            placeSP_group.add([self])
+            placeSP_group.sprites()[0].kill()
 
 
 cooldown_time = 10
